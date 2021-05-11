@@ -7,7 +7,7 @@
 namespace Param{
     inline int randomseed = chrono::high_resolution_clock::now().time_since_epoch().count();
     inline int seed = 123456;
-    inline string instance_set = "GBJ", instance_name = "F3", instance_dir = "instance/", output, logfile = "output/run_log.csv";
+    inline string instance_set = "GBJ", instance_name = "A1", instance_dir = "instance/", output, logfile = "output/run_log.csv";
     namespace LNS{
         //Control update rate of alns
         inline const int lambda = 0.2;
@@ -20,7 +20,7 @@ namespace Param{
         //Sequence beetween two ALNS weight update
         inline int seqment_len = 500;
         //Cooling factor
-        inline const double alpha = 0.99977;
+        inline const double alpha = 0.99997;
         //Range of remove customer rate
         inline const double remove_rate_min = 0.05;
         inline const double remove_rate_max = 0.2;

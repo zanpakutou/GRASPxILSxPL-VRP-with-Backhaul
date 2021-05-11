@@ -38,10 +38,9 @@ int similarity(Solution s, Solution t, vector< int >& matching)
     vector< Route > route_source = s.getRoutes();
     vector< Route > route_target = t.getRoutes();
 
-    int n = route_source.size(), m = route_source.size();
+    int n = route_source.size(), m = route_target.size();
 
     vector< pair< int, pair< int, int > > > edges;
-
     for(int i = 0; i < n; i++)
         for(int j = 0; j < m; j++){
             int cnt = common_subset(route_source[i].getCustomerId(), route_target[j].getCustomerId());
@@ -60,7 +59,7 @@ int similarity(Solution s, Solution t, vector< int >& matching)
         if (picked_source[i.second.first] == false && picked_target[i.second.second] == false)
             value+= i.first, picked_source[i.second.first] = true, picked_target[i.second.second] = true, matching[i.second.first] = i.second.second;
 
-    return  value;
+    return  instance.nb_customer -  value;
 }
 
 /*
@@ -68,21 +67,25 @@ int similarity(Solution s, Solution t, vector< int >& matching)
 */
 void addToElitePool(Solution new_s)
 {
+    similarity_threshold = instance.nb_customer/6;
     if (eliteSet.empty()) {
         eliteSet.push_back(new_s);
         return;
     }
+
     vector< int > __;
+
     int new_cost = new_s.getCost(), worst_objective = 0, min_distance = 1e8;
     int worse_min_distace_index = -1, _ = 1e9;
     bool check = true;
     for(Solution s : eliteSet){
-        int s_cost = s.getCost(), s_similar = similarity(new_s, s, __);
-
+        int s_cost = s.getCost();
+        int s_similar = similarity(new_s, s, __);
         worst_objective = max(worst_objective, s_cost),
         min_distance = min(min_distance, s_similar);
-        if (new_cost > s_cost && s_similar < similarity_threshold)
+        if (new_cost > s_cost - 0.01 && s_similar < similarity_threshold)
             check = false;
+
         if (s_cost > new_cost)
             if (worse_min_distace_index == -1 || s_similar < _){
                 worse_min_distace_index = 1;
@@ -94,6 +97,7 @@ void addToElitePool(Solution new_s)
             eliteSet.push_back(new_s);
         return;
     }
+
     // check = true : solution better than S sastisfy the similarity constraint
     vector< Solution > new_pool;
     if (check){
@@ -196,12 +200,18 @@ Solution pathRelinking(Solution s, Solution t)
 void getBestPathRelinking(Solution &s){
     if (eliteSet.empty()) return;
     Solution new_solution;
-    for(Solution elite : eliteSet)
+
+    for(Solution elite : eliteSet){
+        //cerr << 0 << '\n';
         if ((int)s.getRoutes().size() == (int)elite.getRoutes().size()){
+            //cerr << 1 << '\n';
             new_solution = pathRelinking(s, elite);
+            //cerr << 2 << '\n';
             if (new_solution.isFeasible() && new_solution.getCost() < s.getCost() - 0.1)
                 s = new_solution;
+            //cerr << 3 << '\n';
         }
+    }
 }
 
 
